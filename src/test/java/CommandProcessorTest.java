@@ -26,4 +26,15 @@ class CommandProcessorTest {
         assertEquals(3.7, account.getApr());
         assertEquals(0.0, account.getBalance());
     }
+
+    @Test
+    void invalid_command_is_stored_in_storage() {
+        InvalidCommandStorage storage = new InvalidCommandStorage();
+        CommandProcessor processor = new CommandProcessor(bank, storage);
+
+        processor.process("create checking 12345678 999"); // invalid APR
+
+        assertEquals(1, storage.getAllInvalidCommands().size());
+        assertEquals("create checking 12345678 999", storage.getAllInvalidCommands().get(0));
+    }
 }
