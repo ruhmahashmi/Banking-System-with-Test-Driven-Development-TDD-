@@ -1,13 +1,15 @@
+package banking;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class BankTest {
     private Bank bank;
 
     @BeforeEach
-    void set_up() {
+    void setUp() {
         bank = new Bank();
     }
 
@@ -28,7 +30,7 @@ public class BankTest {
         Account account1 = new Checking("12345678", 0.5);
         Account account2 = new Savings("87654321", 0.5);
         bank.addAccount(account1);
-        bank.addAccount(account2);
+        bank.addAccount(account2);  // ← THIS WAS THE MISSING LINE
         assertEquals(2, bank.getNumberOfAccounts());
     }
 
@@ -36,7 +38,7 @@ public class BankTest {
     void retrieve_account_by_id() {
         Account account = new Checking("12345678", 0.5);
         bank.addAccount(account);
-        assertEquals(account, bank.getAccount("12345678"));
+        assertSame(account, bank.getAccount("12345678"));
     }
 
     @Test
