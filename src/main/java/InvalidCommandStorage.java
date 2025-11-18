@@ -11,6 +11,6 @@ public class InvalidCommandStorage {
     }
 
     public List<String> getAllInvalidCommands() {
-        return new ArrayList<>(invalidCommands);  // return copy for safety
+        return new ArrayList<>(invalidCommands);
     }
 }

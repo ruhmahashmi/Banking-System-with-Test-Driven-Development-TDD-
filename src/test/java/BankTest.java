@@ -30,7 +30,7 @@ public class BankTest {
         Account account1 = new Checking("12345678", 0.5);
         Account account2 = new Savings("87654321", 0.5);
         bank.addAccount(account1);
-        bank.addAccount(account2);  // ← THIS WAS THE MISSING LINE
+        bank.addAccount(account2);
         assertEquals(2, bank.getNumberOfAccounts());
     }
 
