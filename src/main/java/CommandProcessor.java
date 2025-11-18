@@ -10,7 +10,20 @@ public class CommandProcessor {
     }
 
     public void process(String command) {
-        // minimal code to make the test pass
-        bank.createChecking("12345678", 3.7);
+        if (!isValid(command)) {
+            storage.addInvalidCommand(command);
+            return;
+        }
+    }
+
+    private boolean isValid(String command) {
+        String[] parts = command.toLowerCase().split(" ");
+        String type = parts[0];
+
+        return switch (type) {
+            case "create" -> new CreateCommandValidator().validate(command);  // Instance!
+            case "deposit" -> new DepositCommandValidator().validate(command);  // Instance!
+            default -> false;
+        };
     }
 }

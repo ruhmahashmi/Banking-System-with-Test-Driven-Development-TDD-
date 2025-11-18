@@ -13,7 +13,8 @@ class CommandProcessorTest {
     @BeforeEach
     void setUp() {
         bank = new Bank();
-        processor = new CommandProcessor(bank);
+        InvalidCommandStorage storage = new InvalidCommandStorage();
+        processor = new CommandProcessor(bank, storage);
     }
 
     @Test
