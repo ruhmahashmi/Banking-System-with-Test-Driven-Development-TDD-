@@ -14,7 +14,7 @@ class CommandProcessorTest {
     void setUp() {
         bank = new Bank();
         InvalidCommandStorage storage = new InvalidCommandStorage();
-        processor = new CommandProcessor(bank, storage);
+        processor = new CommandProcessor(bank, storage);  // TWO parameters!
     }
 
     @Test
@@ -37,5 +37,27 @@ class CommandProcessorTest {
 
         assertEquals(1, storage.getAllInvalidCommands().size());
         assertEquals("create checking 12345678 999", storage.getAllInvalidCommands().get(0));
+    }
+
+    @Test
+    void invalid_create_command_is_stored_and_not_processed() {
+        InvalidCommandStorage storage = new InvalidCommandStorage();
+        CommandProcessor processor = new CommandProcessor(bank, storage);
+
+        processor.process("create checking 12345678 999"); // invalid APR
+
+        assertEquals(1, storage.getAllInvalidCommands().size());
+        assertFalse(bank.accountExists("12345678")); // not created!
+    }
+
+    @Test
+    void valid_command_is_processed_and_not_stored() {
+        InvalidCommandStorage storage = new InvalidCommandStorage();
+        CommandProcessor processor = new CommandProcessor(bank, storage);
+
+        processor.process("create checking 12345678 2.5");
+
+        assertTrue(storage.getAllInvalidCommands().isEmpty());
+        assertTrue(bank.accountExists("12345678"));
     }
 }
