@@ -1,5 +1,6 @@
-package banking;
-public class DepositCommandValidator extends CommandValidator {
+package sebanking;
+
+public class CreateCommandValidator extends CommandValidator {
 
     @Override
     public boolean validate(String command) {
@@ -9,24 +10,28 @@ public class DepositCommandValidator extends CommandValidator {
 
         String[] parts = command.trim().split("\\s+");
 
-
-        if (parts.length != 3) {
+        if (parts.length != 4) {
             return false;
         }
 
         String type = parts[0].toLowerCase();
-        if (!"deposit".equals(type)) {
+        if (!"create".equals(type)) {
             return false;
         }
 
-        String id = parts[1];
+        String accountType = parts[1].toLowerCase();
+        if (!"checking".equals(accountType) && !"savings".equals(accountType) && !"cd".equals(accountType)) {
+            return false;
+        }
+
+        String id = parts[2];
         if (id.length() != 8 || !id.matches("\\d+")) {
             return false;
         }
 
         try {
-            double amount = Double.parseDouble(parts[2]);
-            if (amount <= 0) {
+            double apr = Double.parseDouble(parts[3]);
+            if (apr < 0 || apr > 10) {
                 return false;
             }
         } catch (NumberFormatException e) {

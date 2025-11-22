@@ -1,4 +1,4 @@
-package banking;
+package sebanking;
 
 public class MasterControl {
     private final CommandValidator validator;

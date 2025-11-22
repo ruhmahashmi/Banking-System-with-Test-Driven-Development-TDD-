@@ -1,4 +1,4 @@
-package banking;
+package sebanking;
 public abstract class Account {
     private String id;
     private double apr;

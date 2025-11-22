@@ -1,4 +1,4 @@
-package banking;
+package sebanking;
 
 public class CommandProcessor {
     private final Bank bank;

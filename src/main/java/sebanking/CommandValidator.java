@@ -1,4 +1,4 @@
-package banking;
+package sebanking;
 public class CommandValidator {
 
     public boolean validate(String command) {
