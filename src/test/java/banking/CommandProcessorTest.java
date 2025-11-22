@@ -1,4 +1,4 @@
-package sebanking;
+package banking;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

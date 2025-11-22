@@ -5,7 +5,7 @@ plugins {
     id 'info.solidsoft.pitest' version '1.5.2'
 }
 
-group 'sebanking'
+group 'org.example'
 version '1.0-SNAPSHOT'
 
 repositories {
@@ -32,8 +32,8 @@ jacocoTestReport {
 }
 
 pitest {
-    targetClasses = ['sebanking.*']
-    targetTests = ['sebanking.*']
+    targetClasses = ['banking.*']
+    targetTests = ['banking.*']
     testSourceSets = [sourceSets.test]
     mainSourceSets = [sourceSets.main]
     pitestVersion = '1.5.2'

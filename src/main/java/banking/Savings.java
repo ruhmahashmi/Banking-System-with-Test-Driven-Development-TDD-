@@ -1,4 +1,4 @@
-package sebanking;
+package banking;
 public class Savings extends Account {
     public Savings(String id, double apr) {
         super(id, apr, 0.0);

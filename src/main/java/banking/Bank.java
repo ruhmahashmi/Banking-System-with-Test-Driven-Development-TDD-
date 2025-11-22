@@ -1,4 +1,4 @@
-package sebanking;
+package banking;
 
 import java.util.HashMap;
 import java.util.Map;

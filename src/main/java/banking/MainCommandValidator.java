@@ -1,4 +1,4 @@
-package sebanking;
+package banking;
 
 public class MainCommandValidator extends CommandValidator {
     private final CreateCommandValidator createValidator = new CreateCommandValidator();
