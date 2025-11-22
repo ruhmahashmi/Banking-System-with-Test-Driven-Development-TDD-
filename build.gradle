@@ -33,7 +33,7 @@ jacocoTestReport {
 
 pitest {
     targetClasses = ['sebanking.*']
-    targetTests = ['banking.*']
+    targetTests = ['sebanking.*']
     testSourceSets = [sourceSets.test]
     mainSourceSets = [sourceSets.main]
     pitestVersion = '1.5.2'
