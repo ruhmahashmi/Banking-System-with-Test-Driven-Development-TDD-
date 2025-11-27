@@ -2,19 +2,20 @@ plugins {
     id 'java'
     id 'idea'
     id 'jacoco'
-    id 'info.solidsoft.pitest' version '1.5.2'
+    id 'info.solidsoft.pitest' version '1.15.0'
 }
 
-group 'org.example'
-version '1.0-SNAPSHOT'
+group = 'org.example'
+version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation 'org.jetbrains:annotations:20.1.0'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.4.2'
+    implementation 'org.jetbrains:annotations:24.0.1'
+    testImplementation platform('org.junit:junit-bom:5.10.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
 }
 
 test {
@@ -27,16 +28,20 @@ test {
 jacocoTestReport {
     reports {
         xml.required = true
-        xml.destination = project.file("builds/jacoco/jacoco.xml")
+        xml.destination = project.file("build/jacoco/jacoco.xml")
     }
 }
 
 pitest {
     targetClasses = ['banking.*']
     targetTests = ['banking.*']
+
+    pitestVersion = '1.15.0'
+    junit5PluginVersion = '1.2.0'
+
     testSourceSets = [sourceSets.test]
     mainSourceSets = [sourceSets.main]
-    pitestVersion = '1.5.2'
-    junit5PluginVersion = "0.12"
+
     outputFormats = ['XML', 'HTML']
+    timestampedReports = false
 }
