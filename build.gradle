@@ -8,6 +8,12 @@ plugins {
 group = 'org.example'
 version = '1.0-SNAPSHOT'
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
 repositories {
     mavenCentral()
 }
@@ -28,7 +34,7 @@ test {
 jacocoTestReport {
     reports {
         xml.required = true
-        xml.destination = project.file("build/jacoco/jacoco.xml")
+        xml.outputLocation = layout.buildDirectory.file("jacoco/jacoco.xml")
     }
 }
 
@@ -38,9 +44,6 @@ pitest {
 
     pitestVersion = '1.15.0'
     junit5PluginVersion = '1.2.0'
-
-    testSourceSets = [sourceSets.test]
-    mainSourceSets = [sourceSets.main]
 
     outputFormats = ['XML', 'HTML']
     timestampedReports = false
