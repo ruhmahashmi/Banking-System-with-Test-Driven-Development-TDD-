@@ -42,4 +42,30 @@ class BankPassTimeTest {
         // 300 * 0.04/12 = +1.00 → 301 → still <1000 → $25 fee
         assertEquals(276.00, acc.getBalance(), 0.01);
     }
+
+    @Test
+    void cd_account_cannot_be_withdrawn_before_12_months() {
+        bank.createCD("99999999", 1.0, 2000.0);
+        bank.passTime(11);
+
+        IllegalStateException thrown = assertThrows(IllegalStateException.class, () -> {
+            bank.withdraw("99999999", 1000);
+        });
+        assertEquals("CD is not mature yet", thrown.getMessage());
+    }
+
+    @Test
+    void cd_account_can_be_withdrawn_after_12_months_and_is_removed_on_full_withdrawal() {
+        bank.createCD("88888888", 1.0, 2000.0);
+        bank.passTime(12);
+
+        Account acc = bank.getAccount("88888888");
+        double finalBalance = acc.getBalance();  // includes 12 months of compound interest
+
+        bank.withdraw("88888888", finalBalance);  // withdraw everything
+
+        assertFalse(bank.accountExists("88888888"));
+    }
+
+
 }

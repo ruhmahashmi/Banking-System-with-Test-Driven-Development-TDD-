@@ -14,8 +14,10 @@ public abstract class Account {
     }
 
     public void applyMonthlyInterest() {
-        double monthlyRate = apr / 100 / 12;  // apr is stored as percentage (e.g., 2.0)
-        balance += balance * monthlyRate;
+        double monthlyRate = apr / 100 / 12;
+        double interest = balance * monthlyRate;
+        balance += interest;
+        balance = Math.round(balance * 100.0) / 100.0;
     }
 
     public Account(String id, double apr, double balance) {
@@ -47,4 +49,10 @@ public abstract class Account {
             balance -= amount;
         }
     }
+
+    public boolean canWithdraw() {
+        return true; // Checking & Savings always can
+    }
+
+
 }

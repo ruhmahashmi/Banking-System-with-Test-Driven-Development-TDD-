@@ -25,13 +25,6 @@ public class Bank {
         }
     }
 
-    public void withdraw(String id, double amount) {
-        Account account = getAccount(id);
-        if (account != null) {
-            account.withdraw(amount);
-        }
-    }
-
     public int getNumberOfAccounts() {
         return accounts.size();
     }
@@ -55,19 +48,44 @@ public class Bank {
         if (months <= 0) return;
 
         for (Account account : accounts.values()) {
-            for (int i = 0; i < months; i++) {
-                if (account instanceof Savings savings) {
-                    savings.applyMonthlyInterest();
-                    if (savings.getBalance() < 1000) {
-                        savings.withdraw(25);  // fee
-                    }
-                } else if (account instanceof CD cd) {
-                    cd.applyMonthlyInterest();
-                } else if (account instanceof Checking) {
+            account.incrementMonths(months);
+            if (account instanceof CD) {
+                // CD compounds monthly but doesn't pay until withdrawal
+                for (int i = 0; i < months; i++) {
                     account.applyMonthlyInterest();
                 }
+            } else if (account instanceof Savings savings) {
+                for (int i = 0; i < months; i++) {
+                    savings.applyMonthlyInterest();
+                    if (savings.getBalance() < 1000) {
+                        savings.withdraw(25);
+                        savings.balance = Math.max(0, savings.getBalance()); // cannot go negative
+                    }
+                }
+            } else if (account instanceof Checking) {
+                // Checking earns no interest
             }
-            account.incrementMonths(months);
         }
     }
+
+    public void withdraw(String id, double amount) {
+        Account account = getAccount(id);
+        if (account == null) {
+            return;
+        }
+
+        // CD maturity check
+        if (account instanceof CD && account.getMonthsPassed() < 12) {
+            throw new IllegalStateException("CD is not mature yet");
+        }
+
+        account.withdraw(amount);
+
+        // Remove CD if balance is zero (after full withdrawal)
+        if (account instanceof CD && account.getBalance() <= 0.00) {
+            accounts.remove(id);
+        }
+    }
+
+
 }
