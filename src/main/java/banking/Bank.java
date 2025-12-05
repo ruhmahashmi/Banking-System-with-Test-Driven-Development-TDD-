@@ -87,5 +87,46 @@ public class Bank {
         }
     }
 
+    public String getFormattedSummary() {
+        StringBuilder sb = new StringBuilder();
+        for (Account account : accounts.values()) {
+            String type = account instanceof Checking ? "Checking" :
+                    account instanceof Savings ? "Savings" : "CD";
+            sb.append(type)
+                    .append(" ")
+                    .append(account.getId())
+                    .append(" ")
+                    .append(String.format("%.2f", account.getBalance()))
+                    .append(" ")
+                    .append(String.format("%.2f", account.getApr()));
+
+            if (account instanceof Savings s && s.getBalance() < 1000) {
+                sb.append(" WARNING: Balance below $1000");
+            }
+            if (account instanceof CD cd && cd.getMonthsPassed() < 12) {
+                sb.append(" WARNING: CD not mature");
+            }
+            sb.append("\n");
+        }
+        return sb.toString().trim();
+    }
+
+    public void transfer(String fromId, String toId, double amount) {
+        Account from = getAccount(fromId);
+        Account to = getAccount(toId);
+        if (from == null || to == null) return;
+
+        if (from instanceof CD && from.getMonthsPassed() < 12) return;
+
+        if (from.getBalance() >= amount) {
+            from.withdraw(amount);
+            to.deposit(amount);
+        }
+    }
+
+    public java.util.Collection<Account> getAccounts() {
+        return accounts.values();
+    }
+
 
 }
