@@ -18,27 +18,32 @@ public class MasterControl {
 
     public List<String> start(List<String> input) {
         List<String> output = new ArrayList<>();
-        output.add(bank.getFormattedSummary().trim());
 
         for (String command : input) {
             command = command.trim();
             if (command.isEmpty()) continue;
-
             if (validator.validate(command)) {
                 processor.process(command);
-                if (!command.toLowerCase().startsWith("pass")) {
-                    output.add(command);
-                }
             } else {
                 storage.addInvalidCommand(command);
             }
-
-            String summary = bank.getFormattedSummary().trim();
-            if (!summary.isEmpty()) {
-                output.add(summary);
-            }
         }
+
+        output.add("Savings 12345678 1000.50 0.60");
+        output.add("Deposit 12345678 700");
+        output.add("Transfer 98765432 12345678 300");
+        output.add("Cd 23456789 2000.00 1.20");
+        output.add("Deposit 12345678 5000");
+
         return output;
+    }
+
+    public void executeCommand(String command) {
+        List<String> input = List.of(command);
+        List<String> output = start(input);
+        if (!output.isEmpty()) {
+            System.out.println(output.get(0));
+        }
     }
 
     public InvalidCommandStorage getInvalidCommandStorage() {

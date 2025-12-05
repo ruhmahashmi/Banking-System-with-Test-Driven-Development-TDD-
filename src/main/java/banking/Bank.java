@@ -50,14 +50,12 @@ public class Bank {
             return;
         }
 
-        // CD maturity check
         if (account instanceof CD && account.getMonthsPassed() < 12) {
             throw new IllegalStateException("CD is not mature yet");
         }
 
         account.withdraw(amount);
 
-        // Remove CD if balance is zero (after full withdrawal)
         if (account instanceof CD && account.getBalance() <= 0.00) {
             accounts.remove(id);
         }
@@ -101,18 +99,18 @@ public class Bank {
     public void passTime(int months) {
         if (months < 1 || months > 60) return;
 
-        var toRemove = new ArrayList<String>();
+        java.util.List<String> toRemove = new java.util.ArrayList<>();
 
-        for (Account acc : accounts.values()) {
+        for (Account acc : new java.util.ArrayList<>(accounts.values())) {
             acc.incrementMonths(months);
 
             for (int i = 0; i < months; i++) {
                 if (acc instanceof CD) {
                     acc.applyMonthlyInterest();
-                } else if (acc instanceof Savings s) {
-                    s.applyMonthlyInterest();
-                    if (s.getBalance() < 1000) {
-                        s.withdraw(25);
+                } else if (acc instanceof Savings) {
+                    ((Savings) acc).applyMonthlyInterest();
+                    if (acc.getBalance() < 1000) {
+                        acc.withdraw(25);
                     }
                 }
             }

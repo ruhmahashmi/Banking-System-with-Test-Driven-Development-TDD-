@@ -13,7 +13,7 @@ public class CommandProcessorTest {
     void setUp() {
         bank = new Bank();
         storage = new InvalidCommandStorage();
-        processor = new CommandProcessor(bank, storage);
+        processor = new CommandProcessor(bank);
     }
 
     @Test

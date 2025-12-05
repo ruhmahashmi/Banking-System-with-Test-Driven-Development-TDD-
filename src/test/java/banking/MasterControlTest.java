@@ -2,20 +2,25 @@ package banking;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class MasterControlTest {
+
     private MasterControl masterControl;
     private Bank bank;
     private InvalidCommandStorage storage;
+    private List<String> input;  // ← RESTORED for unchanged test
 
     @BeforeEach
     void setUp() {
         bank = new Bank();
-        CommandValidator validator = new MainCommandValidator();
-        CommandProcessor processor = new CommandProcessor(bank, storage);
-        storage = new InvalidCommandStorage();
-        masterControl = new MasterControl(validator, processor, storage);
+        masterControl = new MasterControl(bank);
+        storage = masterControl.getInvalidCommandStorage();
+        input = new ArrayList<>();  // ← INITIALIZED here
     }
 
     @Test

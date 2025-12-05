@@ -4,7 +4,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MainCommandValidatorTest {
-    private final MainCommandValidator validator = new MainCommandValidator();
+    private final Bank bank = new Bank();
+    private final MainCommandValidator validator = new MainCommandValidator(bank);
 
 
     @Test

@@ -51,7 +51,7 @@ public abstract class Account {
     }
 
     public boolean canWithdraw() {
-        return true; // Checking & Savings always can
+        return true;
     }
 
 

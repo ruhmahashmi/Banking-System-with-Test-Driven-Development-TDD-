@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CreateCommandValidatorTest {
-
-    private final CreateCommandValidator validator = new CreateCommandValidator();
+    private final Bank bank = new Bank();
+    private final CreateCommandValidator validator = new CreateCommandValidator(bank);
 
     @Test
     void valid_create_checking_returns_true() {

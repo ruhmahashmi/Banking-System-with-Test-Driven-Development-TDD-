@@ -16,7 +16,6 @@ public class TransferCommandValidator {
         Account from = bank.getAccount(parts[1]);
         Account to = bank.getAccount(parts[2]);
 
-        // Can only transfer between Checking and Savings
         boolean fromIsCheckingOrSavings = from instanceof Checking || from instanceof Savings;
         boolean toIsCheckingOrSavings = to instanceof Checking || to instanceof Savings;
 

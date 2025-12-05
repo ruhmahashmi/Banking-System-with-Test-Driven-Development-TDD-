@@ -3,8 +3,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DepositCommandValidatorTest {
-
-    private final DepositCommandValidator validator = new DepositCommandValidator();
+    private final Bank bank = new Bank();
+    private final DepositCommandValidator validator = new DepositCommandValidator(bank);
 
     @Test
     void valid_deposit_returns_true() {
