@@ -1,29 +1,44 @@
-// src/main/java/banking/MasterControl.java
 package banking;
 
-import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MasterControl {
+    private final Bank bank;
     private final CommandValidator validator;
     private final CommandProcessor processor;
     private final InvalidCommandStorage storage;
-    private final Bank bank;
 
-    public MasterControl(Bank bank, InvalidCommandStorage storage) {
+    public MasterControl(Bank bank) {
         this.bank = bank;
-        this.storage = storage;
-        this.validator = new CommandValidator(bank);
-        this.processor = new CommandProcessor(bank, storage);
+        this.storage = new InvalidCommandStorage();
+        this.validator = new MainCommandValidator(bank);
+        this.processor = new CommandProcessor(bank);
     }
 
-    public void executeCommand(String command) {
-        if (validator.validate(command)) {
-            processor.process(command);
-            System.out.println(bank.getFormattedSummary());
-            System.out.println();
-        } else {
-            storage.addInvalidCommand(command);
+    public List<String> start(List<String> input) {
+        List<String> output = new ArrayList<>();
+        output.add(bank.getFormattedSummary().trim());
+
+        for (String command : input) {
+            command = command.trim();
+            if (command.isEmpty()) continue;
+
+            if (validator.validate(command)) {
+                processor.process(command);
+                if (!command.toLowerCase().startsWith("pass")) {
+                    output.add(command);
+                }
+            } else {
+                storage.addInvalidCommand(command);
+            }
+
+            String summary = bank.getFormattedSummary().trim();
+            if (!summary.isEmpty()) {
+                output.add(summary);
+            }
         }
+        return output;
     }
 
     public InvalidCommandStorage getInvalidCommandStorage() {
@@ -32,17 +47,6 @@ public class MasterControl {
 
     public static void main(String[] args) {
         Bank bank = new Bank();
-        InvalidCommandStorage storage = new InvalidCommandStorage();
-        MasterControl masterControl = new MasterControl(bank, storage);
-
-        Scanner scanner = new Scanner(System.in);
-        System.out.println(bank.getFormattedSummary());
-        System.out.println();
-
-        while (scanner.hasNextLine()) {
-            String command = scanner.nextLine().trim();
-            if (command.equalsIgnoreCase("quit")) break;
-            masterControl.executeCommand(command);
-        }
+        MasterControl mc = new MasterControl(bank);
     }
 }

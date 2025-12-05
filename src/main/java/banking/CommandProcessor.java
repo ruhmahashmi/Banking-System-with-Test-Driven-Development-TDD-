@@ -1,10 +1,11 @@
-// src/main/java/banking/CommandProcessor.java
 package banking;
+
+import java.util.ArrayList;
 
 public class CommandProcessor {
     private final Bank bank;
 
-    public CommandProcessor(Bank bank, InvalidCommandStorage storage) {
+    public CommandProcessor(Bank bank) {
         this.bank = bank;
     }
 
@@ -14,47 +15,28 @@ public class CommandProcessor {
 
         switch (type) {
             case "create"   -> handleCreate(parts);
-            case "deposit"  -> handleDeposit(parts);
-            case "withdraw" -> handleWithdraw(parts);
-            case "transfer" -> handleTransfer(parts);
-            case "pass"     -> handlePassTime(parts);
+            case "deposit"  -> bank.deposit(parts[1], Double.parseDouble(parts[2]));
+            case "withdraw" -> bank.withdraw(parts[1], Double.parseDouble(parts[2]));
+            case "transfer" -> bank.transfer(parts[1], parts[2], Double.parseDouble(parts[3]));
+            case "pass"     -> {
+                int months = Integer.parseInt(parts[1]);
+                bank.passTime(months);
+            }
         }
     }
 
     private void handleCreate(String[] parts) {
-        String accType = parts[1].toLowerCase();
+        String type = parts[1].toLowerCase();
         String id = parts[2];
         double apr = Double.parseDouble(parts[3]);
-        if (accType.equals("cd")) {
+
+        if (type.equals("cd")) {
             double balance = Double.parseDouble(parts[4]);
             bank.createCD(id, apr, balance);
-        } else if (accType.equals("checking")) {
+        } else if (type.equals("checking")) {
             bank.createChecking(id, apr);
-        } else if (accType.equals("savings")) {
+        } else if (type.equals("savings")) {
             bank.createSavings(id, apr);
         }
-    }
-
-    private void handleDeposit(String[] parts) {
-        bank.deposit(parts[1], Double.parseDouble(parts[2]));
-    }
-
-    private void handleWithdraw(String[] parts) {
-        bank.withdraw(parts[1], Double.parseDouble(parts[2]));
-    }
-
-    private void handleTransfer(String[] parts) {
-        String fromId = parts[1];
-        String toId = parts[2];
-        double amount = Double.parseDouble(parts[3]);
-        bank.transfer(fromId, toId, amount);
-    }
-
-    private void handlePassTime(String[] parts) {
-        int months = Integer.parseInt(parts[1]);
-        bank.passTime(months);
-
-        bank.getAccounts().values().removeIf(acc ->
-                !(acc instanceof CD) && acc.getBalance() <= 0.00);
     }
 }
