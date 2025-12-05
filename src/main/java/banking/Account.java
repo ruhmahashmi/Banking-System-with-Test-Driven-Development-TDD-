@@ -14,7 +14,7 @@ public abstract class Account {
     }
 
     public void applyMonthlyInterest() {
-        double monthlyRate = apr / 100 / 12;
+        double monthlyRate = apr / 100 / 12;  // apr is stored as percentage (e.g., 2.0)
         balance += balance * monthlyRate;
     }
 

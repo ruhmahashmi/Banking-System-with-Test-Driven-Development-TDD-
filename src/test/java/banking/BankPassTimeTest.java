@@ -27,7 +27,19 @@ class BankPassTimeTest {
         bank.passTime(1);
 
         Account account = bank.getAccount("12345678");
-        assertEquals(1000.1667, account.getBalance(), 0.01);
+        assertEquals(1001.67, account.getBalance(), 0.01);
         // Monthly interest = 1000 * (0.02 / 12) = 1.6666... → new balance ≈ 1001.67
+    }
+
+    @Test
+    void savings_below_1000_after_interest_gets_25_fee() {
+        bank.createSavings("11111111", 4.0);
+        bank.deposit("11111111", 300.00);
+
+        bank.passTime(1);
+
+        Account acc = bank.getAccount("11111111");
+        // 300 * 0.04/12 = +1.00 → 301 → still <1000 → $25 fee
+        assertEquals(276.00, acc.getBalance(), 0.01);
     }
 }
