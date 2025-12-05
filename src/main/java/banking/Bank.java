@@ -50,4 +50,8 @@ public class Bank {
         CD cd = new CD(id, apr, initialBalance);
         addAccount(cd);
     }
+
+    public void passTime(int months) {
+        // next steps implement
+    }
 }
