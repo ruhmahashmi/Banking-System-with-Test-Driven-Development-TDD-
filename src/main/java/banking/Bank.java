@@ -52,6 +52,22 @@ public class Bank {
     }
 
     public void passTime(int months) {
-        // next steps implement
+        if (months <= 0) return;
+
+        for (Account account : accounts.values()) {
+            for (int i = 0; i < months; i++) {
+                if (account instanceof Savings savings) {
+                    savings.applyMonthlyInterest();
+                    if (savings.getBalance() < 1000) {
+                        savings.withdraw(25);  // fee
+                    }
+                } else if (account instanceof CD cd) {
+                    cd.applyMonthlyInterest();
+                } else if (account instanceof Checking) {
+                    account.applyMonthlyInterest();
+                }
+            }
+            account.incrementMonths(months);
+        }
     }
 }

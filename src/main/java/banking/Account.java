@@ -3,6 +3,20 @@ public abstract class Account {
     private String id;
     private double apr;
     protected double balance;
+    protected int monthsPassed = 0;
+
+    public int getMonthsPassed() {
+        return monthsPassed;
+    }
+
+    public void incrementMonths(int months) {
+        this.monthsPassed += months;
+    }
+
+    public void applyMonthlyInterest() {
+        double monthlyRate = apr / 100 / 12;
+        balance += balance * monthlyRate;
+    }
 
     public Account(String id, double apr, double balance) {
         this.id = id;
