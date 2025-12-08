@@ -91,4 +91,19 @@ public class CreateCommandValidatorTest {
     void multiple_spaces_returns_true() {
         assertTrue(validator.validate("create  checking  12345678  0.6"));
     }
+
+    @Test
+    void valid_create_with_apr_zero_returns_true() {
+        Bank bank = new Bank();
+        CreateCommandValidator validator = new CreateCommandValidator(bank);
+        assertTrue(validator.validate("create savings 12345678 0"));
+    }
+
+    @Test
+    void valid_create_with_apr_ten_returns_true() {
+        Bank bank = new Bank();
+        CreateCommandValidator validator = new CreateCommandValidator(bank);
+        assertTrue(validator.validate("create cd 87654321 10"));
+    }
+
 }

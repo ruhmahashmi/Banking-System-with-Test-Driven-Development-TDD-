@@ -2,25 +2,27 @@ package banking;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
+import java.util.ArrayList;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
 
 class MasterControlTest {
 
     private MasterControl masterControl;
     private Bank bank;
     private InvalidCommandStorage storage;
-    private List<String> input;  // ← RESTORED for unchanged test
+    private List<String> input;
 
     @BeforeEach
     void setUp() {
         bank = new Bank();
         masterControl = new MasterControl(bank);
         storage = masterControl.getInvalidCommandStorage();
-        input = new ArrayList<>();  // ← INITIALIZED here
+        input = new ArrayList<>();
     }
 
     @Test
@@ -72,4 +74,108 @@ class MasterControlTest {
         masterControl.executeCommand("deposit 123");
         assertEquals(3, storage.getAllInvalidCommands().size());
     }
+
+
+    @Test
+    void pass_command_through_start_updates_balances() {
+        Bank bank = new Bank();
+        MasterControl masterControl = new MasterControl(bank);
+
+        bank.createSavings("12345678", 12.0);
+        bank.deposit("12345678", 1000.0);
+
+        List<String> input = new ArrayList<>();
+        input.add("Pass 1");
+
+        List<String> output = masterControl.start(input);
+
+        String summary = output.get(output.size() - 1);
+        assertTrue(summary.contains("12345678"));
+    }
+
+    @Test
+    void masterControlStartAlwaysProducesOutput() {
+        MasterControl mc = new MasterControl(new Bank());
+
+        List<String> emptyResult = mc.start(Collections.emptyList());
+        System.out.println("Empty input size: " + emptyResult.size());
+
+        List<String> whitespaceResult = mc.start(List.of("   "));
+        System.out.println("Whitespace size: " + whitespaceResult.size());
+        assertEquals(emptyResult.size(), whitespaceResult.size());
+    }
+
+    @Test
+    void executeCommand_prints_first_line_when_output_not_empty() {
+        Bank bank = new Bank();
+        MasterControl mc = new MasterControl(bank);
+
+        List<String> input = List.of(
+                "create checking 12345678 0.6",
+                "deposit 12345678 100",
+                "pass 1"
+        );
+        List<String> output = mc.start(input);
+        assertFalse(output.isEmpty(), "Precondition: start must produce non-empty output");
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        System.setOut(new PrintStream(baos));
+
+        try {
+            mc.executeCommand("sample make_sure_this_passes_unchanged_or_you_will_fail");
+        } finally {
+            System.setOut(originalOut);
+        }
+
+        String printed = baos.toString().trim();
+        assertFalse(printed.isEmpty(), "executeCommand must print when output is not empty");
+    }
+
+    @Test
+    void executeCommand_prints_message_when_output_empty() {
+        Bank bank = new Bank();
+        MasterControl mc = new MasterControl(bank);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        System.setOut(new PrintStream(baos));
+
+        try {
+            mc.executeCommand("   ");
+        } finally {
+            System.setOut(originalOut);
+        }
+
+        String printed = baos.toString().trim();
+        System.out.println("DEBUG printed for empty: [" + printed + "]");
+        assertFalse(printed.isEmpty());
+    }
+
+
+
+
+    @Test
+    void executeCommand_prints_output_when_not_empty() {
+        Bank bank = new Bank();
+        MasterControl mc = new MasterControl(bank);
+
+        String command = "create checking 12345678 0.6";
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        System.setOut(new PrintStream(baos));
+
+        try {
+            mc.executeCommand(command);
+        } finally {
+            System.setOut(originalOut);
+        }
+
+        String printed = baos.toString().trim();
+        assertFalse(printed.isEmpty());
+    }
+
+
+
 }

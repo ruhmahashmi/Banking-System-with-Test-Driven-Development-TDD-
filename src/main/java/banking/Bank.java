@@ -30,19 +30,17 @@ public class Bank {
     }
 
     public void createChecking(String id, double apr) {
-        Checking checking = new Checking(id, apr);
-        addAccount(checking);
+        addAccount(new Checking(id, apr));
     }
 
     public void createSavings(String id, double apr) {
-        Savings savings = new Savings(id, apr);
-        addAccount(savings);
+        addAccount(new Savings(id, apr));
     }
 
     public void createCD(String id, double apr, double initialBalance) {
-        CD cd = new CD(id, apr, initialBalance);
-        addAccount(cd);
+        addAccount(new CD(id, apr, initialBalance));
     }
+
 
     public void withdraw(String id, double amount) {
         Account account = getAccount(id);
@@ -54,11 +52,52 @@ public class Bank {
             throw new IllegalStateException("CD is not mature yet");
         }
 
+        double currentBalance = account.getBalance();
+        if (amount > currentBalance) {
+            return;
+        }
+
+        boolean isCd = account instanceof CD;
+        boolean fullWithdrawal = false;
+
+        if (isCd) {
+            CD cd = (CD) account;
+            if (amount >= currentBalance || amount == cd.getInitialBalance()) {
+                fullWithdrawal = true;
+            }
+        }
+
         account.withdraw(amount);
 
-        if (account instanceof CD && account.getBalance() <= 0.00) {
+        if (isCd && fullWithdrawal) {
             accounts.remove(id);
         }
+    }
+
+
+
+
+
+
+    public void transfer(String fromId, String toId, double amount) {
+        Account from = getAccount(fromId);
+        Account to = getAccount(toId);
+
+        if (from == null || to == null) return;
+        if (from instanceof CD && from.getMonthsPassed() < 12) return;
+        if (from.getBalance() < amount) return;
+
+        from.withdraw(amount);
+        to.deposit(amount);
+    }
+
+    public boolean passTime(int months) {
+        for (int m = 0; m < months; m++) {
+            for (Account account : accounts.values()) {
+                account.passTime(1);
+            }
+        }
+        return true;
     }
 
     public String getFormattedSummary() {
@@ -66,68 +105,20 @@ public class Bank {
         for (Account account : accounts.values()) {
             String type = account instanceof Checking ? "Checking" :
                     account instanceof Savings ? "Savings" : "CD";
+
             sb.append(type)
                     .append(" ")
                     .append(account.getId())
                     .append(" ")
                     .append(String.format("%.2f", account.getBalance()))
                     .append(" ")
-                    .append(String.format("%.2f", account.getApr()));
-
-            if (account instanceof Savings s && s.getBalance() < 1000) {
-                sb.append(" WARNING: Balance below $1000");
-            }
-            if (account instanceof CD cd && cd.getMonthsPassed() < 12) {
-                sb.append(" WARNING: CD not mature");
-            }
-            sb.append("\n");
+                    .append(String.format("%.2f", account.getApr()))
+                    .append("\n");
         }
         return sb.toString().trim();
-    }
-
-    public void transfer(String fromId, String toId, double amount) {
-        Account from = getAccount(fromId);
-        Account to = getAccount(toId);
-        if (from == null || to == null || from.getBalance() < amount) return;
-
-        if (from instanceof CD && from.getMonthsPassed() < 12) return;
-
-        from.withdraw(amount);
-        to.deposit(amount);
-    }
-
-    public void passTime(int months) {
-        if (months < 1 || months > 60) return;
-
-        java.util.List<String> toRemove = new java.util.ArrayList<>();
-
-        for (Account acc : new java.util.ArrayList<>(accounts.values())) {
-            acc.incrementMonths(months);
-
-            for (int i = 0; i < months; i++) {
-                if (acc instanceof CD) {
-                    acc.applyMonthlyInterest();
-                } else if (acc instanceof Savings) {
-                    ((Savings) acc).applyMonthlyInterest();
-                    if (acc.getBalance() < 1000) {
-                        acc.withdraw(25);
-                    }
-                }
-            }
-
-            if (!(acc instanceof CD) && acc.getBalance() <= 0.01) {
-                toRemove.add(acc.getId());
-            }
-        }
-
-        for (String id : toRemove) {
-            accounts.remove(id);
-        }
     }
 
     public java.util.Collection<Account> getAccounts() {
         return accounts.values();
     }
-
-
 }

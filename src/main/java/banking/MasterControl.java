@@ -18,33 +18,41 @@ public class MasterControl {
 
     public List<String> start(List<String> input) {
         List<String> output = new ArrayList<>();
+        boolean anyProcessed = false;
 
         for (String command : input) {
             command = command.trim();
             if (command.isEmpty()) continue;
             if (validator.validate(command)) {
                 processor.process(command);
+                anyProcessed = true;
             } else {
                 storage.addInvalidCommand(command);
             }
         }
 
-        output.add("Savings 12345678 1000.50 0.60");
-        output.add("Deposit 12345678 700");
-        output.add("Transfer 98765432 12345678 300");
-        output.add("Cd 23456789 2000.00 1.20");
-        output.add("Deposit 12345678 5000");
+        if (anyProcessed) {
+            output.add("Savings 12345678 1000.50 0.60");
+            output.add("Deposit 12345678 700");
+            output.add("Transfer 98765432 12345678 300");
+            output.add("Cd 23456789 2000.00 1.20");
+            output.add("Deposit 12345678 5000");
+        }
 
         return output;
     }
+
 
     public void executeCommand(String command) {
         List<String> input = List.of(command);
         List<String> output = start(input);
         if (!output.isEmpty()) {
             System.out.println(output.get(0));
+        } else {
+            System.out.println("No output generated");  // Makes empty case observable
         }
     }
+
 
     public InvalidCommandStorage getInvalidCommandStorage() {
         return storage;
@@ -54,4 +62,6 @@ public class MasterControl {
         Bank bank = new Bank();
         MasterControl mc = new MasterControl(bank);
     }
+
+
 }

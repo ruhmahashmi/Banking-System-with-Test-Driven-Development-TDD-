@@ -50,4 +50,67 @@ public class CommandProcessorTest {
         Account account = bank.getAccount("22222222");
         assertEquals(150.0, account.getBalance(), 0.001);
     }
+
+    @Test
+    void withdraw_command_decreases_balance_via_processor() {
+        Bank bank = new Bank();
+        CommandProcessor processor = new CommandProcessor(bank);
+
+        bank.createChecking("11111111", 1.0);
+        bank.deposit("11111111", 500.0);
+
+        processor.process("withdraw 11111111 200");
+
+        assertEquals(300.0, bank.getAccount("11111111").getBalance(), 0.001);
+    }
+
+    @Test
+    void pass_command_advances_time_via_processor() {
+        Bank bank = new Bank();
+        CommandProcessor processor = new CommandProcessor(bank);
+
+        bank.createSavings("22222222", 12.0);
+        bank.deposit("22222222", 1000.0);
+
+        processor.process("pass 1");
+        assertTrue(bank.getAccount("22222222").getBalance() > 1000.0);
+    }
+
+    @Test
+    void transfer_command_uses_bank_transfer() {
+        Bank bank = new Bank();
+        CommandProcessor processor = new CommandProcessor(bank);
+
+        bank.createChecking("11111111", 1.0);
+        bank.createSavings("22222222", 1.0);
+        bank.deposit("11111111", 400.0);
+
+        processor.process("transfer 11111111 22222222 150");
+
+        assertEquals(250.0, bank.getAccount("11111111").getBalance(), 0.001);
+        assertEquals(150.0, bank.getAccount("22222222").getBalance(), 0.001);
+    }
+
+
+    @Test
+    void processorIgnoresInvalidFormatGracefully() {
+        CommandProcessor processor = new CommandProcessor(bank);
+        processor.process("CREATE_CHECKING 12345678 1.0 extra");
+    }
+
+    @Test
+    void createCdCommand_createsCdAccountWithCorrectIdAprAndBalance() {
+        Bank bank = new Bank();
+        CommandProcessor processor = new CommandProcessor(bank);
+
+        processor.process("create cd 99999999 1.5 5000");
+
+        Account account = bank.getAccount("99999999");
+        assertNotNull(account);
+        assertTrue(account instanceof CD);
+        assertEquals(1.5, account.getApr(), 0.0001);
+        assertEquals(5000.0, account.getBalance(), 0.0001);
+    }
+
+
 }

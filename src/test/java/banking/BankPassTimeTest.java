@@ -28,7 +28,7 @@ class BankPassTimeTest {
 
         Account account = bank.getAccount("12345678");
         assertEquals(1001.67, account.getBalance(), 0.01);
-        // Monthly interest = 1000 * (0.02 / 12) = 1.6666... → new balance ≈ 1001.67
+
     }
 
     @Test
@@ -39,7 +39,6 @@ class BankPassTimeTest {
         bank.passTime(1);
 
         Account acc = bank.getAccount("11111111");
-        // 300 * 0.04/12 = +1.00 → 301 → still <1000 → $25 fee
         assertEquals(276.00, acc.getBalance(), 0.01);
     }
 
@@ -60,12 +59,34 @@ class BankPassTimeTest {
         bank.passTime(12);
 
         Account acc = bank.getAccount("88888888");
-        double finalBalance = acc.getBalance();  // includes 12 months of compound interest
+        double finalBalance = acc.getBalance();
 
-        bank.withdraw("88888888", finalBalance);  // withdraw everything
+        bank.withdraw("88888888", finalBalance);
 
         assertFalse(bank.accountExists("88888888"));
     }
+
+    @Test
+    void savings_exactly_1000_after_interest_avoids_fee() {
+        Bank bank = new Bank();
+        bank.createSavings("sav1000", 1.2);
+        bank.deposit("sav1000", 999.00);
+
+        bank.passTime(1);
+
+        assertTrue(bank.getAccount("sav1000").getBalance() > 999.0);
+    }
+
+    @Test
+    void savings_passTime_increments_months_each_iteration() {
+        Savings s = new Savings("sav1", 1.0);
+        s.deposit(2000.0);
+
+        s.passTime(3);
+
+        assertEquals(3, s.getMonthsPassed());
+    }
+
 
 
 }

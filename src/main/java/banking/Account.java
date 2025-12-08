@@ -43,15 +43,21 @@ public abstract class Account {
     }
 
     public void withdraw(double amount) {
-        if (amount > balance) {
+        balance -= amount;
+        if (balance < 0) {
             balance = 0;
-        } else {
-            balance -= amount;
         }
     }
 
     public boolean canWithdraw() {
         return true;
+    }
+
+    public void passTime(int months) {
+        for (int i = 0; i < months; i++) {
+            applyMonthlyInterest();
+            incrementMonths(1);
+        }
     }
 
 

@@ -1,5 +1,7 @@
 package banking;
+
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DepositCommandValidatorTest {
@@ -75,4 +77,36 @@ public class DepositCommandValidatorTest {
     void multiple_spaces_returns_true() {
         assertTrue(validator.validate("deposit  12345678  100.5"));
     }
+
+    @Test
+    void deposit_amount_just_below_limit_is_valid() {
+        assertTrue(validator.validate("deposit 12345678 9999.99"));
+    }
+
+    @Test
+    void deposit_amount_exactly_zero_is_invalid() {
+        assertFalse(validator.validate("deposit 12345678 0"));
+    }
+
+    @Test
+    void deposit_amount_exactly_at_limit_is_valid() {
+        assertTrue(validator.validate("deposit 12345678 10000"));
+    }
+
+    @Test
+    void deposit_amount_above_limit_is_invalid() {
+        assertFalse(validator.validate("deposit 12345678 10000.01"));
+    }
+
+    @Test
+    void valid_transfer_between_savings_and_checking_returns_true() {
+        Bank bank = new Bank();
+        bank.createSavings("11111111", 1.0);
+        bank.createChecking("22222222", 1.0);
+        TransferCommandValidator validator = new TransferCommandValidator(bank);
+
+        assertTrue(validator.validate("transfer 11111111 22222222 100"));
+    }
+
+
 }

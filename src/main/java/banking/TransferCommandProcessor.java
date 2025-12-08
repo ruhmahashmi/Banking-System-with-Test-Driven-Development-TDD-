@@ -16,7 +16,6 @@ public class TransferCommandProcessor {
         Account from = bank.getAccount(fromId);
         Account to = bank.getAccount(toId);
 
-        // Atomic transfer
         if (from.getBalance() >= amount) {
             from.withdraw(amount);
             to.deposit(amount);

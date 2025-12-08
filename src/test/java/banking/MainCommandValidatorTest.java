@@ -63,4 +63,14 @@ public class MainCommandValidatorTest {
     void empty_command_returns_false() {
         assertFalse(validator.validate(""));
     }
+
+    @Test
+    void mainValidatorMultipleSpacesOnlyReturnsFalse() {
+        Bank bank = new Bank();
+        MainCommandValidator validator = new MainCommandValidator(bank);
+        assertFalse(validator.validate("     "));
+    }
+
+
+
 }
