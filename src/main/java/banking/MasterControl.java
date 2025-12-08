@@ -18,18 +18,7 @@ public class MasterControl {
 
     public List<String> start(List<String> input) {
         List<String> output = new ArrayList<>();
-        boolean anyProcessed = false;
-
-        for (String command : input) {
-            command = command.trim();
-            if (command.isEmpty()) continue;
-            if (validator.validate(command)) {
-                processor.process(command);
-                anyProcessed = true;
-            } else {
-                storage.addInvalidCommand(command);
-            }
-        }
+        boolean anyProcessed = processCommands(input);
 
         if (anyProcessed) {
             output.add("Savings 12345678 1000.50 0.60");
@@ -42,6 +31,21 @@ public class MasterControl {
         return output;
     }
 
+    private boolean processCommands(List<String> input) {
+        boolean anyProcessed = false;
+        for (String command : input) {
+            String trimmed = command.trim();
+            if (trimmed.isEmpty()) continue;
+
+            if (validator.validate(trimmed)) {
+                processor.process(trimmed);
+                anyProcessed = true;
+            } else {
+                storage.addInvalidCommand(trimmed);
+            }
+        }
+        return anyProcessed;
+    }
 
     public void executeCommand(String command) {
         List<String> input = List.of(command);
@@ -49,10 +53,9 @@ public class MasterControl {
         if (!output.isEmpty()) {
             System.out.println(output.get(0));
         } else {
-            System.out.println("No output generated");  // Makes empty case observable
+            System.out.println("No output generated");
         }
     }
-
 
     public InvalidCommandStorage getInvalidCommandStorage() {
         return storage;
@@ -62,6 +65,4 @@ public class MasterControl {
         Bank bank = new Bank();
         MasterControl mc = new MasterControl(bank);
     }
-
-
 }

@@ -41,54 +41,50 @@ public class Bank {
         addAccount(new CD(id, apr, initialBalance));
     }
 
-
     public void withdraw(String id, double amount) {
         Account account = getAccount(id);
-        if (account == null) {
+        if (!canWithdraw(account, amount)) {
             return;
         }
 
-        if (account instanceof CD && account.getMonthsPassed() < 12) {
-            throw new IllegalStateException("CD is not mature yet");
-        }
-
-        double currentBalance = account.getBalance();
-        if (amount > currentBalance) {
-            return;
-        }
-
-        boolean isCd = account instanceof CD;
-        boolean fullWithdrawal = false;
-
-        if (isCd) {
-            CD cd = (CD) account;
-            if (amount >= currentBalance || amount == cd.getInitialBalance()) {
-                fullWithdrawal = true;
-            }
-        }
-
+        boolean wasFullCdWithdrawal = isFullCdWithdrawal(account, amount);
         account.withdraw(amount);
 
-        if (isCd && fullWithdrawal) {
+        if (wasFullCdWithdrawal) {
             accounts.remove(id);
         }
     }
 
+    private boolean canWithdraw(Account account, double amount) {
+        if (account == null) return false;
+        if (account instanceof CD && account.getMonthsPassed() < 12) {
+            throw new IllegalStateException("CD is not mature yet");
+        }
+        return amount <= account.getBalance();
+    }
 
-
-
-
+    private boolean isFullCdWithdrawal(Account account, double amount) {
+        if (!(account instanceof CD)) return false;
+        CD cd = (CD) account;
+        return amount >= account.getBalance() || amount == cd.getInitialBalance();
+    }
 
     public void transfer(String fromId, String toId, double amount) {
         Account from = getAccount(fromId);
         Account to = getAccount(toId);
 
-        if (from == null || to == null) return;
-        if (from instanceof CD && from.getMonthsPassed() < 12) return;
-        if (from.getBalance() < amount) return;
+        if (!canTransfer(from, to, amount)) {
+            return;
+        }
 
         from.withdraw(amount);
         to.deposit(amount);
+    }
+
+    private boolean canTransfer(Account from, Account to, double amount) {
+        return from != null && to != null &&
+                !(from instanceof CD && from.getMonthsPassed() < 12) &&
+                from.getBalance() >= amount;
     }
 
     public boolean passTime(int months) {
@@ -103,9 +99,7 @@ public class Bank {
     public String getFormattedSummary() {
         StringBuilder sb = new StringBuilder();
         for (Account account : accounts.values()) {
-            String type = account instanceof Checking ? "Checking" :
-                    account instanceof Savings ? "Savings" : "CD";
-
+            String type = getAccountType(account);
             sb.append(type)
                     .append(" ")
                     .append(account.getId())
@@ -116,6 +110,12 @@ public class Bank {
                     .append("\n");
         }
         return sb.toString().trim();
+    }
+
+    private String getAccountType(Account account) {
+        if (account instanceof Checking) return "Checking";
+        if (account instanceof Savings) return "Savings";
+        return "CD";
     }
 
     public java.util.Collection<Account> getAccounts() {
